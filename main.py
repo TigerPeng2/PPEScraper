@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 from numpy import mean, median, percentile
@@ -17,6 +18,9 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker
 
 import os
+
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.wait import WebDriverWait
 
 import pcsparser
 
@@ -44,12 +48,14 @@ for i in range(0, len(included)):
 
 exclude = "-" + "+-".join(excluded)
 
-pcsparser.parse("[20 PCS] KN95 Protective 5-Ply Face Mask >95% PM2.5 Disposable Respirator K-N95")
 keyword = included[0]
 included.pop(0)
 include = "\"%s\"" % keyword + "+" + "+".join(included)
 
-timeinterval = ""
+#true for full listings, but scraping that takes so so so long
+nolimit = False
+#time back in history to search, in days
+timeinterval = "76"
 today = today().date()
 
 if timeinterval == "":
@@ -73,15 +79,16 @@ prices = []
 pieces = []
 pricesppcs = []
 
-nextpagepath = "//a[@aria-label ='Next page']"
+nextpagepath = "//a[@class='pagination__next']"
 proceed = True
 searches = 0
 while(proceed):
+    i = 1
     for i in range(1, 201):
-        titlepath = "/html/body/div[4]/div[4]/div[2]/div[1]/div[2]/ul/li[%d]/div/div[2]/a/h3" % i
-        pricepath = "/html/body/div[4]/div[4]/div[2]/div[1]/div[2]/ul/li[%d]/div/div[2]//span[@class='POSITIVE' or @class='STRIKETHROUGH POSITIVE']" % i
-        shippingpath = "/html/body/div[4]/div[4]/div[2]/div[1]/div[2]/ul/li[%d]/div/div[2]//span[@class='s-item__shipping s-item__logisticsCost']" % i
-        datepath = "/html/body/div[4]/div[4]/div[2]/div[1]/div[2]/ul/li[%d]/div/div[2]//span[@role='text']" % i
+        titlepath = "//div[@id='mainContent']/div[2]/div[1]/div[2]/ul/li[%d]/div/div[2]/a/h3" % i
+        pricepath = "//div[@id='mainContent']/div[2]/div[1]/div[2]/ul/li[%d]/div/div[2]//span[@class='POSITIVE' or @class='STRIKETHROUGH POSITIVE']" % i
+        shippingpath = "//div[@id='mainContent']/div[2]/div[1]/div[2]/ul/li[%d]/div/div[2]//span[@class='s-item__shipping s-item__logisticsCost']" % i
+        datepath = "//div[@id='mainContent']/div[2]/div[1]/div[2]/ul/li[%d]/div/div[2]//span[@role='text']" % i
 
         try:
             title = driver.find_element_by_xpath(titlepath).text
@@ -93,13 +100,13 @@ while(proceed):
             proceed = False
             break
 
-        if date >= earliestdate:
+        if nolimit or date >= earliestdate:
             if "Free" in shipping:
                 shipping = 0
             else:
                 shipping = float(clean_prices(shipping))
 
-            #print(title)
+            print(title)
             pcs = pcsparser.parse(title)
 
             price = float(clean_prices(price))
@@ -117,7 +124,9 @@ while(proceed):
     searches += 200
     try:
         nextbutton = driver.find_element_by_xpath(nextpagepath)
-        nextbutton.click()
+        nextbutton.send_keys(Keys.RETURN)
+        element_present = expected_conditions.presence_of_element_located((By.CLASS_NAME, 'POSITIVE'))
+        WebDriverWait(driver, timeout = 8).until(element_present)
         page += 1
     except NoSuchElementException:
         break
