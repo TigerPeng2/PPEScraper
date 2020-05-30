@@ -38,43 +38,39 @@ def clean_dates(text):
     new_text = re.sub("Sold ", '', new_text)
     return new_text
 
-driver = webdriver.Chrome("../seleniumchrome/chromedriver.exe")
+driver = webdriver.Chrome()
 
-excludes = open("../excludes", "r")
-excluded = excludes.readlines()
-for i in range(0, len(excluded)):
-    excluded[i] = excluded[i].replace("\n", "")
+config = configparser.ConfigParser()
+cfg = config.read("config.ini")
+sections = config.sections()
 
-exclude = "-" + "+-".join(excluded)
+excluded = config['EXCLUDE']['Excluded']
+excluded_arr = excluded.replace(" ", "").split(",")
+exclude = "-" + "+-".join(excluded_arr)
 
-includes = open("../includes", "r")
-included = includes.readlines()
-for i in range(0, len(included)):
-    included[i] = included[i].replace("\n", "")
+included = config['INCLUDE']['Included']
+included_arr = included.replace(" ", "").split(",")
 
-keyword = included[0]
-included.pop(0)
-include = "\"%s\"" % keyword + "+" + "+".join(included)
+keyword = config['SEARCH']['Keyword']
+
+include = "\"%s\"" % keyword + "+" + "+".join(included_arr)
 
 page = 1
 url = "https://www.ebay.com/sch/i.html?_from=R40&_nkw=%s+%s&_sacat=0&LH_TitleDesc=0&LH_PrefLoc=1&_fsrp=1&_sop=13&LH_Complete=1&LH_Sold=1&_ipg=200&_pgn=%d" % (include, exclude, page)
 
 #true to retrieve every listing, but scraping that takes so so so long
-nolimit = False
+nolimit = config['SEARCH']['NoLimit']
 
 #time back in history to search, in days
-timeinterval = "76"
+timeinterval = config['SEARCH']['SearchInterval']
 
 today = today().date()
 
-if timeinterval == "":
-    earliestdate = today + relativedelta(months=-1)
-else:
-    earliestdate = today + relativedelta(days=-int(timeinterval))
+earliestdate = today + relativedelta(days=-int(timeinterval))
 
 #output path, according to keyword ex: n95, n99, etc.
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-outputdir = os.path.join(ROOT_DIR, "listings/%s" % keyword)
+outputdir = os.path.join(ROOT_DIR, "examples/%s" % keyword)
 if not os.path.exists(outputdir):
     os.makedirs(outputdir)
 
@@ -153,13 +149,15 @@ cleantable = cleanframe.to_html(os.path.join(outputdir, keyword + " cleanchart.h
 bp = pd.DataFrame(cleanframe['unit_price']).plot.box(sym = '')
 f1 = plt.figure(1)
 plt.title(keyword.upper() + ' Price Distribution from ' + str(earliestdate) + " to " + str(today))
+f1.set_figheight(10.8)
+f1.set_figwidth(19.2)
 bp.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(5))
 bp.yaxis.set_minor_locator(matplotlib.ticker.AutoMinorLocator(5))
 bp.grid(b = True, which = 'both', axis = 'y')
 bp.figure.savefig(os.path.join(outputdir, keyword + " boxplot"))
 
 #rolling average
-days = "3"
+days = config['SEARCH']['AveragingWindow']
 f2 = plt.figure(figsize = (19.2, 10.8))
 plt.title(keyword.upper() + " " + days + ' Day Rolling Average')
 upc = cleanframe[['date', 'unit_price']]
@@ -169,17 +167,18 @@ rmean = mean.unit_price.rolling(window = int(days)).mean()
 plt.plot(rmean, label = '%s Day Rolling Average' % days, color = 'blue')
 f2.savefig(os.path.join(outputdir, keyword + " rollingaverage"))
 
-driver.close()
-excludes.close()
-includes.close()
+showGraphs = bool(config['SEARCH']['ShowGraphs'])
+if(showGraphs):
+    f1.show()
+    f2.show()
+
 print("Press any key to exit.")
 input()
+driver.close()
 plt.close('all')
 
 #TO DO
 #bat file with arguments to display the graphs or not in commandline
-#cfg variables, merge include and exclude, and insert prompts for other variables:
-#keyword, includes, excludes
 #nolimits toggle in command line
 #fill in holes in dates with null values, let mean() function ignore and re-average
 
