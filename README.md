@@ -14,7 +14,8 @@ In order to use this application, you have to have python 3.7 installed, navigat
 
 pip install -r requirements.txt
 
-In order to install the required modules.
+In order to install the required modules. It is advised that you do this in a virtual environment, to avoid
+existing installations of xsml or other modules.
 
 Additionally, you will have to install the selenium driver of your respective browser here:
 
