@@ -1,4 +1,5 @@
 # PPEScraper created by Tiger Peng
+# Created at TeenHacks HTX on May 29-30 between 8:00 PM and 7:00 PM
 [Intro and Setup]\
 This app is a web scraper that scrapes Ebay's sold listings area for PPE listings, specifically masks, and allows you to see what
 other people have been paying, as well as the fluctuations in the Ebay mask market! Spooky!
