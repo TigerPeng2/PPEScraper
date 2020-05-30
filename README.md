@@ -35,7 +35,7 @@ After you've executed the program, you'll be outputted:\
   "(keyword) rollingaverage.png", a rolling average plot of the price fluctuation over the given time frame
   
   These images and files will be stored in the listings folder in the project root. They will look something like this:
-  ![N95 Box and Whisker Plot](https://octodex.github.com/images/yaktocat.png)
+  ![N95 Box and Whisker Plot](https://github.com/ThatKidTiger/PPEScraper/blob/master/examples/n95/n95%20boxplot.png)
 
 
 [Configs]
