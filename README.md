@@ -23,18 +23,13 @@ and place it in your system's PATH.
 
 
 [Use]\
-When you open this project, locate the file "scrape.bat", which is a quickstart for a n95 mask search as described in the intro. Additional
-arguments include:\
-   -u, tags the search as unlimited, meaning it will search through every listing. Takes a long long time\
-   -i, tags the search to make the graphs invisible, i.e. don't display the graphs at the end.
-   
-   The "invisible.bat" and "unlimited.bat" have been included for you as well.
+When you open this project, locate the file "scrape.bat", which is a quickstart for a n95 mask search as described in the intro.
    
 After you've executed the program, you'll be outputted:\
-  "(keyword) chart.html", a chart of all the scraped listings in the given time frame
-  "(keyword) cleanchart.html", the same chart, but with outliers removed
-  "(keyword) boxplot.png", a box and whisker plot of the price distribution
-  "(keyword) rollingaverage.png", a rolling average plot of the price fluctuation over the given time frame
+  "(keyword) chart.html" - a chart of all the scraped listings in the given time frame\
+  "(keyword) cleanchart.html" - the same chart, but with outliers removed\
+  "(keyword) boxplot.png" - a box and whisker plot of the price distribution\
+  "(keyword) rollingaverage.png" - a rolling average plot of the price fluctuation over the given time frame\
   
   These images and files will be stored in the listings folder in the project root. They will look something like this:
   ![N95 Box and Whisker Plot](https://github.com/ThatKidTiger/PPEScraper/blob/master/examples/n95/n95%20boxplot.png)
