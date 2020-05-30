@@ -111,7 +111,7 @@ while(proceed):
             else:
                 shipping = float(clean_prices(shipping))
 
-            print(title)
+            #print(title)
             pcs = pcsparser.parse(title)
 
             price = float(clean_prices(price))
@@ -159,10 +159,10 @@ bp.grid(b = True, which = 'both', axis = 'y')
 bp.figure.savefig(os.path.join(outputdir, keyword + " boxplot"))
 
 #rolling average
-days = "7"
+days = "28"
 f2 = plt.figure(figsize = (19.2, 10.8))
 plt.title(keyword.upper() + " " + days + ' Day Rolling Average')
-upc = listingsframe[['date', 'unit_price']]
+upc = cleanframe[['date', 'unit_price']]
 mean = upc.groupby('date').mean()
 rmean = mean.unit_price.rolling(window = int(days)).mean()
 
@@ -172,10 +172,13 @@ f2.savefig(os.path.join(outputdir, keyword + " rollingaverage"))
 driver.close()
 excludes.close()
 includes.close()
+print("Press any key to exit.")
+input()
 plt.close('all')
 
 #TO DO
-#front end variables:
+#bat file with arguments to display the graphs or not
+#cfg variables:
 #keyword, includes, excludes
 #rolling average period
 #data analysis period

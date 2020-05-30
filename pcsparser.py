@@ -26,11 +26,13 @@ def parse(text):
         index = uppertitle.find("QTY")
     elif "PIECE" in uppertitle:
         index = uppertitle.find("PIECE")
+    elif "INDIVIDUAL" in uppertitle:
+        index = uppertitle.find("INDIVIDUAL")
 
     if index == -1:
         return 1
     else:
-        print(text[0:index].strip())
+        #print(text[0:index].strip())
         return int(isolate_pcs(text[0:index].strip()))
 
 def isolate_pcs(text):
@@ -87,51 +89,3 @@ def get_first_pcs(text):
             return text
         except ValueError:
             return 1
-
-# def clean_pcs(text):
-#     empty = []
-#     if " " in text:
-#         text_array = text.split(" ")
-#         for x in range(len(text_array) - 1, -1, -1):
-#             text_array[x] = re.sub("[^/\-0-9]", '', text_array[x])
-#             if text_array[x] == "":
-#                 text_array.pop(x)
-#             elif "/" or "-" in text_array[x]:
-#                 pcsstring = clean_multiple_pcs(text_array[x])
-#                 return int(pcsstring)
-#         try:
-#             pcsstring = text_array[len(text_array) - 1]
-#         except IndexError:
-#             return 1
-#     else:
-#         pcsstring = re.sub("[^/\-0-9]", '', text)
-#         if pcsstring == "":
-#             return 1
-#     if "/" or "-" in pcsstring:
-#         pcsstring = clean_multiple_pcs(pcsstring)
-#     else:
-#         if pcsstring != " ":
-#             return int(pcsstring)
-#         else:
-#             return 1
-#     return int(pcsstring)
-#
-# def clean_multiple_pcs(text):
-#     if "/" in text:
-#         pieces = text.split("/")
-#         for x in range(0, len(pieces)):
-#             try:
-#                 int(pieces[x])
-#                 return pieces[x]
-#             except ValueError:
-#                 continue
-#     elif "-" in text:
-#         pieces = text.split("-")
-#         for x in range(0, len(pieces)):
-#             try:
-#                 int(pieces[x])
-#                 return pieces[x]
-#             except ValueError:
-#                 continue
-#     else:
-#         return 1
