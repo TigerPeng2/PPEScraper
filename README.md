@@ -36,6 +36,9 @@ After you've executed the program, you'll be outputted:\
   
   These images and files will be stored in the listings folder in the project root. They will look something like this:
   ![N95 Box and Whisker Plot](https://github.com/ThatKidTiger/PPEScraper/blob/master/examples/n95/n95%20boxplot.png)
+  
+Obviously, you'll want to search for more than just one type of mask, and one month in the past. For that, you'll have to go to
+the config.ini file.
 
 
 [Configs]
