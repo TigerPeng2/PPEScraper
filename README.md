@@ -25,7 +25,7 @@ and place it in your system's PATH.
 [Use]\
 When you open this project, locate the file "scrape.bat", which is a quickstart for a n95 mask search as described in the intro. Additional
 arguments include:\
-   -u, tags the search as unlimited, meaning it will search through every listing. Takes a long long time
+   -u, tags the search as unlimited, meaning it will search through every listing. Takes a long long time\
    -i, tags the search to make the graphs invisible, i.e. don't display the graphs at the end.
    
 After you've executed the program, you'll be outputted:\
