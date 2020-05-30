@@ -3,6 +3,8 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
+import configparser
+
 import numpy as np
 
 import re
@@ -36,7 +38,7 @@ def clean_dates(text):
     new_text = re.sub("Sold ", '', new_text)
     return new_text
 
-driver = webdriver.Chrome("C:/Users/nytig/seleniumchrome/chromedriver.exe")
+driver = webdriver.Chrome("../seleniumchrome/chromedriver.exe")
 
 excludes = open("../excludes", "r")
 excluded = excludes.readlines()
@@ -175,12 +177,9 @@ input()
 plt.close('all')
 
 #TO DO
-#bat file with arguments to display the graphs or not
+#bat file with arguments to display the graphs or not in commandline
 #cfg variables, merge include and exclude, and insert prompts for other variables:
 #keyword, includes, excludes
-#rolling average period
-#data analysis period
-#nolimits toggle
-#option to set date limit
+#nolimits toggle in command line
 #fill in holes in dates with null values, let mean() function ignore and re-average
 

@@ -1,6 +1,6 @@
 attrs==19.1.0
 backcall==0.1.0
-bleach==3.1.0
+bleach==3.1.5
 certifi==2020.4.5.1
 colorama==0.4.1
 contextlib2==0.5.5
@@ -29,6 +29,7 @@ nbconvert==5.5.0
 nbformat==4.4.0
 notebook==5.7.8
 numpy==1.18.4
+packaging==20.4
 pandas==1.0.3
 pandocfilters==1.4.2
 parso==0.5.0
