@@ -148,10 +148,8 @@ cleanframe = listingsframe[listingsframe.z_score < 3]
 cleantable = cleanframe.to_html(os.path.join(outputdir, keyword + " cleanchart.html"))
 
 #boxplot pyplot code
-bp = pd.DataFrame(cleanframe['unit_price']).plot.box()
+bp = pd.DataFrame(cleanframe['unit_price']).plot.box(sym = '')
 f1 = plt.figure(1)
-f1.set_figheight(10.8)
-f1.set_figwidth(19.2)
 plt.title(keyword.upper() + ' Price Distribution from ' + str(earliestdate) + " to " + str(today))
 bp.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(5))
 bp.yaxis.set_minor_locator(matplotlib.ticker.AutoMinorLocator(5))
@@ -159,7 +157,7 @@ bp.grid(b = True, which = 'both', axis = 'y')
 bp.figure.savefig(os.path.join(outputdir, keyword + " boxplot"))
 
 #rolling average
-days = "28"
+days = "3"
 f2 = plt.figure(figsize = (19.2, 10.8))
 plt.title(keyword.upper() + " " + days + ' Day Rolling Average')
 upc = cleanframe[['date', 'unit_price']]
@@ -184,4 +182,5 @@ plt.close('all')
 #data analysis period
 #nolimits toggle
 #option to set date limit
+#fill in holes in dates with null values, let mean() function ignore and re-average
 
