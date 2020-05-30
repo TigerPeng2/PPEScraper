@@ -145,7 +145,7 @@ z_scores = scipy.stats.zscore(listingsframe['unit_price'])
 z_scores = np.abs(z_scores)
 listingsframe['z_score'] = z_scores
 cleanframe = listingsframe[listingsframe.z_score < 3]
-cleantable = listingsframe.to_html(os.path.join(outputdir, keyword + " cleanchart.html"))
+cleantable = cleanframe.to_html(os.path.join(outputdir, keyword + " cleanchart.html"))
 
 #boxplot pyplot code
 bp = pd.DataFrame(cleanframe['unit_price']).plot.box()
