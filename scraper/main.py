@@ -20,7 +20,7 @@ import os
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
-import pcsparser
+from scraper import pcsparser
 
 import scipy.stats
 
@@ -38,14 +38,14 @@ def clean_dates(text):
 
 driver = webdriver.Chrome("C:/Users/nytig/seleniumchrome/chromedriver.exe")
 
-excludes = open("excludes", "r")
+excludes = open("../excludes", "r")
 excluded = excludes.readlines()
 for i in range(0, len(excluded)):
     excluded[i] = excluded[i].replace("\n", "")
 
 exclude = "-" + "+-".join(excluded)
 
-includes = open("includes", "r")
+includes = open("../includes", "r")
 included = includes.readlines()
 for i in range(0, len(included)):
     included[i] = included[i].replace("\n", "")
@@ -176,7 +176,7 @@ plt.close('all')
 
 #TO DO
 #bat file with arguments to display the graphs or not
-#cfg variables:
+#cfg variables, merge include and exclude, and insert prompts for other variables:
 #keyword, includes, excludes
 #rolling average period
 #data analysis period
