@@ -28,6 +28,8 @@ arguments include:\
    -u, tags the search as unlimited, meaning it will search through every listing. Takes a long long time\
    -i, tags the search to make the graphs invisible, i.e. don't display the graphs at the end.
    
+   The "invisible.bat" and "unlimited.bat" have been included for you as well.
+   
 After you've executed the program, you'll be outputted:\
   "(keyword) chart.html", a chart of all the scraped listings in the given time frame
   "(keyword) cleanchart.html", the same chart, but with outliers removed
