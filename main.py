@@ -3,7 +3,6 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
-from numpy import mean, median, percentile
 import numpy as np
 
 import re
@@ -11,7 +10,6 @@ import re
 from dateutil.parser import *
 from dateutil.utils import today
 from dateutil.relativedelta import relativedelta
-from datetime import *
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -24,11 +22,15 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 import pcsparser
 
+import scipy.stats
+
+#Cleans the ebay formatting to retrieve the float value of the listed price
 def clean_prices(text):
     new_text = text
     new_text = re.sub("[^.0-9]", '', new_text)
     return new_text
 
+#Cleans the date formatting off of the ebay listing to retrieve the date value
 def clean_dates(text):
     new_text = text
     new_text = re.sub("Sold ", '', new_text)
@@ -41,21 +43,26 @@ excluded = excludes.readlines()
 for i in range(0, len(excluded)):
     excluded[i] = excluded[i].replace("\n", "")
 
+exclude = "-" + "+-".join(excluded)
+
 includes = open("includes", "r")
 included = includes.readlines()
 for i in range(0, len(included)):
     included[i] = included[i].replace("\n", "")
 
-exclude = "-" + "+-".join(excluded)
-
 keyword = included[0]
 included.pop(0)
 include = "\"%s\"" % keyword + "+" + "+".join(included)
 
-#true for full listings, but scraping that takes so so so long
+page = 1
+url = "https://www.ebay.com/sch/i.html?_from=R40&_nkw=%s+%s&_sacat=0&LH_TitleDesc=0&LH_PrefLoc=1&_fsrp=1&_sop=13&LH_Complete=1&LH_Sold=1&_ipg=200&_pgn=%d" % (include, exclude, page)
+
+#true to retrieve every listing, but scraping that takes so so so long
 nolimit = False
+
 #time back in history to search, in days
 timeinterval = "76"
+
 today = today().date()
 
 if timeinterval == "":
@@ -63,9 +70,7 @@ if timeinterval == "":
 else:
     earliestdate = today + relativedelta(days=-int(timeinterval))
 
-page = 1
-url = "https://www.ebay.com/sch/i.html?_from=R40&_nkw=%s+%s&_sacat=0&LH_TitleDesc=0&LH_PrefLoc=1&_fsrp=1&_sop=13&LH_Complete=1&LH_Sold=1&_ipg=200&_pgn=%d" % (include, exclude, page)
-
+#output path, according to keyword ex: n95, n99, etc.
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 outputdir = os.path.join(ROOT_DIR, "listings/%s" % keyword)
 if not os.path.exists(outputdir):
@@ -131,47 +136,49 @@ while(proceed):
     except NoSuchElementException:
         break
 
-listings = {"titles" : titles, "prices" : prices, "dates" : dates, "pcs" : pieces, "unit price" : pricesppcs}
+listings = {"title" : titles, "price" : prices, "date" : dates, "pcs" : pieces, "unit_price" : pricesppcs}
 listingsframe = pd.DataFrame(listings)
 table = listingsframe.to_html(os.path.join(outputdir, keyword + " chart.html"))
 print(listingsframe)
+#eliminate outliers
+z_scores = scipy.stats.zscore(listingsframe['unit_price'])
+z_scores = np.abs(z_scores)
+listingsframe['z_score'] = z_scores
+cleanframe = listingsframe[listingsframe.z_score < 3]
+cleantable = listingsframe.to_html(os.path.join(outputdir, keyword + " cleanchart.html"))
 
-# listings = {"titles" : titles, "prices" : prices, "dates" : dates}
-# listingframe = pd.DataFrame(listings)
-#
-# print(name.upper() + ":")
-# print("$" + str(round(mean(prices), 2)) + " Mean")
-# print("$" + str(round(median(prices), 2)) + " Median")
-# print("$" + str(round(percentile(prices, 25), 2)) + " 25th Percentile")
-# print("$" + str(round(percentile(prices, 75), 2)) + " 75th Percentile")
-# print(listingframe[['prices', 'dates']])
-#
-# #boxplot pyplot code
-# bp = pd.DataFrame(listingframe['prices']).plot.box()
-# plt.figure(1)
-# plt.title(name.upper() + ' Price Distribution')
-# bp.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(10))
-# bp.yaxis.set_minor_locator(matplotlib.ticker.AutoMinorLocator(5))
-# bp.grid(b = True, which = 'both', axis = 'y')
-# bp.figure.savefig(os.path.join(outputdir, name + " boxplot"))
-#
-# #rolling average
-# f2 = plt.figure(figsize = (19.2, 10.8))
-# plt.title(name.upper() + ' 3 Day Rolling Average')
-# pc = listingframe[['dates', 'prices']]
-# mm = pc.prices.rolling(window = 3).mean()
-#
-# #pc = plt.plot(pc.dates, pc.prices, label = 'Average Price', color = 'blue')
-# mm = plt.plot(listingframe['dates'], mm, label = '3 Day Rolling Average', color = 'blue')
-# f2.savefig(os.path.join(outputdir, name + " lineplot"))
+#boxplot pyplot code
+bp = pd.DataFrame(cleanframe['unit_price']).plot.box()
+f1 = plt.figure(1)
+f1.set_figheight(10.8)
+f1.set_figwidth(19.2)
+plt.title(keyword.upper() + ' Price Distribution from ' + str(earliestdate) + " to " + str(today))
+bp.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(5))
+bp.yaxis.set_minor_locator(matplotlib.ticker.AutoMinorLocator(5))
+bp.grid(b = True, which = 'both', axis = 'y')
+bp.figure.savefig(os.path.join(outputdir, keyword + " boxplot"))
+
+#rolling average
+days = "7"
+f2 = plt.figure(figsize = (19.2, 10.8))
+plt.title(keyword.upper() + " " + days + ' Day Rolling Average')
+upc = listingsframe[['date', 'unit_price']]
+mean = upc.groupby('date').mean()
+rmean = mean.unit_price.rolling(window = int(days)).mean()
+
+plt.plot(rmean, label = '%s Day Rolling Average' % days, color = 'blue')
+f2.savefig(os.path.join(outputdir, keyword + " rollingaverage"))
 
 driver.close()
 excludes.close()
 includes.close()
-#plt.close('all')
+plt.close('all')
 
 #TO DO
-#add multi page functionality
-#pk, pcs, pc, pack, qty
-#option to parse for buying in bulk
+#front end variables:
+#keyword, includes, excludes
+#rolling average period
+#data analysis period
+#nolimits toggle
+#option to set date limit
 
